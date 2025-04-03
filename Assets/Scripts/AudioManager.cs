@@ -13,6 +13,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip click;
     public AudioClip hover;
     public AudioClip leaves;
+    public AudioClip breathingHard;
 
     private void Awake()
     {

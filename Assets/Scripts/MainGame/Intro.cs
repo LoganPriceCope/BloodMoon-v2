@@ -44,7 +44,7 @@ public class Intro : MonoBehaviour
     {
         StartCoroutine(Fade());
         StartCoroutine(RotatePlayer());
-        float currentTime = 3f;
+        float currentTime = 9f;
         float start;
         audioManager.ReturnMusicValues(out start);
         while(currentTime > 0)
@@ -63,7 +63,7 @@ public class Intro : MonoBehaviour
     {
         audioManager.PlaySFX(audioManager.leaves);
         yield return new WaitForSeconds(0.5f);
-        LeanTween.value(fade.color.a, 0f, 1.5f)
+        LeanTween.value(fade.color.a, 0f, 5f)
             .setOnUpdate((float val) =>
             {
                 Color c = fade.color;

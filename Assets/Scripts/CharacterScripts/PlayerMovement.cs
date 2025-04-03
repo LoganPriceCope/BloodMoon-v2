@@ -1,33 +1,56 @@
 using UnityEngine;
-
+using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering;
+using UnityEngine.UI;
+using System.Collections;
+using System;
+using UnityEngine.SceneManagement;
 public class PlayerMovement : MonoBehaviour
 {
-
+    // Objects
+    public Animator playerAnimator;
     public CharacterController controller;
+    public Volume volume;
+    public Transform groundCheck;
+    AudioManager audioManager;
+    private Vignette mainVignette;
+    public LayerMask groundMask;
 
-    public float speed;
-    public float originalSpeed = 4f;
-    public float crouchSpeed = 1.5f;
-    public float runSpeed = 6f;
-
-    public bool isRunning = false;
-    public bool isCrouching = false;
+    // Player Settings
+    public float speed; // Player Current Speed
+    public float originalSpeed = 4f; // Default Walk Speed
+    public float crouchSpeed = 1.5f; // Default Crouch Speed
+    public float runSpeed = 6f; // Default Run Speed
+    public float gravity = -9.81f;
+    public float groundDistance = 0.1f;
+    public float jumpHeight = 3f;
 
     public float playerHeight = 2.5f;
     public float crouchHeight = 1.5f;
 
-    public float gravity = -9.81f;
-    public float jumpHeight = 3f;
+    public float staminaBar = 0f;
 
-    public Transform groundCheck;
-    public float groundDistance = 0.1f;
-    public LayerMask groundMask;
-
-    Vector3 velocity;
+    // Checks
+    public bool isRunning = false;
+    public bool isCrouching = false;
     bool isGrounded;
+    bool canRun = true;
+    bool runSoundPlayed = false;
+    bool inFade = false;
+
+    // Other Variables
+    private Vector3 lastPosition;
+    Vector3 velocity;
+    
+
+    public void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
 
     void Update()
     {
+        // Gravity
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0)
@@ -35,29 +58,86 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = -2f;
         }
 
+        // Walking Check
+        if(Vector3.Distance(transform.position, lastPosition) > 0.01f)
+        {
+            playerAnimator.SetBool("Walking", true);
+        }
+        else
+        {
+            playerAnimator.SetBool("Walking", false);
+        }
+        lastPosition = transform.position;
+
+        // Crouching
         if (Input.GetKey(KeyCode.LeftControl))
         {
+            playerAnimator.SetBool("Crouching", true);
+            playerAnimator.SetBool("Walking", false);
             speed = crouchSpeed;
             isCrouching = true;
             controller.height = crouchHeight;
         }
         else
         {
+            playerAnimator.SetBool("Crouching", false);
             isCrouching = false;
             controller.height = playerHeight;
         }
 
-        if (Input.GetKey(KeyCode.LeftShift) && !isCrouching)
+        // Sprinting
+        if (Input.GetKey(KeyCode.LeftShift) && !isCrouching && canRun)
         {
             speed = runSpeed;
             isRunning = true;
+            
         }
         else if (!isCrouching)
         {
             speed = originalSpeed;
             isRunning = false;
         }
+        
+        // Stamina
+        if (isRunning)
+        {
+            if (staminaBar < 100)
+            {
+                staminaBar = staminaBar + 0.2f;
+            }
+        }
+        else
+        {
+            if (staminaBar > 0)
+            {
+                staminaBar = staminaBar - 0.2f;
+            }
+        }
+        if (volume.profile.TryGet(out mainVignette))
+        {
+            LeanTween.value(mainVignette.intensity.value, (staminaBar / 300f) + 0.45f, 0.1f)
+                .setOnUpdate((float val) =>
+                {
+                    mainVignette.intensity.value = val;
+                });
+        }
 
+        if (staminaBar < 40)
+        {
+            canRun = true;
+            runSoundPlayed = false;
+        }
+        else
+        {
+            OutOfStamina();
+            
+        }
+        if (staminaBar > 90)
+        {
+            canRun = false;
+        }
+
+        // Movement
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
@@ -65,6 +145,7 @@ public class PlayerMovement : MonoBehaviour
 
         controller.Move(move * speed * Time.deltaTime);
 
+        // Jump
         if(Input.GetButtonDown("Jump") && isGrounded)
         {
             velocity.y += Mathf.Sqrt(jumpHeight * -2f * gravity);
@@ -73,5 +154,14 @@ public class PlayerMovement : MonoBehaviour
         velocity.y += gravity * Time.deltaTime;
 
         controller.Move(velocity * Time.deltaTime);
+    }
+
+    void OutOfStamina() // Enables Stamina Sound
+    {
+        if (!runSoundPlayed)
+        {
+            runSoundPlayed = true;
+            audioManager.PlaySFX(audioManager.breathingHard);
+        }
     }
 }
