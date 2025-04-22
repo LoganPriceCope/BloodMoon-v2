@@ -41,6 +41,8 @@ public class PlayerMovement : MonoBehaviour
     // Other Variables
     private Vector3 lastPosition;
     Vector3 velocity;
+
+    public float currentLoudness = 10f;
     
 
     public void Awake()
@@ -99,30 +101,31 @@ public class PlayerMovement : MonoBehaviour
         }
         
         // Stamina
+        // (explanation for me: If the stamina bar is above 0, it will subtract 0.2f. However, if the player is running and has less than 100 stamina, stamima will increase by 0.2f.)
         if (isRunning)
         {
             if (staminaBar < 100)
             {
-                staminaBar = staminaBar + 0.2f;
+                staminaBar = staminaBar + 0.03f;
             }
         }
         else
         {
             if (staminaBar > 0)
             {
-                staminaBar = staminaBar - 0.2f;
+                staminaBar = staminaBar - 0.03f;
             }
         }
         if (volume.profile.TryGet(out mainVignette))
         {
-            LeanTween.value(mainVignette.intensity.value, (staminaBar / 300f) + 0.45f, 0.1f)
+            LeanTween.value(mainVignette.intensity.value, (staminaBar / 1000f) + 0.45f, 0.1f)
                 .setOnUpdate((float val) =>
                 {
                     mainVignette.intensity.value = val;
                 });
         }
 
-        if (staminaBar < 40)
+        if (staminaBar < 45)
         {
             canRun = true;
             runSoundPlayed = false;
@@ -132,7 +135,7 @@ public class PlayerMovement : MonoBehaviour
             OutOfStamina();
             
         }
-        if (staminaBar > 90)
+        if (staminaBar > 60)
         {
             canRun = false;
         }
