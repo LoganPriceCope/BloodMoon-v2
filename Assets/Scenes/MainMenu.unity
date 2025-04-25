@@ -904,6 +904,10 @@ MonoBehaviour:
   hover: {fileID: 8300000, guid: ff447839ef196ed43aa6e91fc0ec634d, type: 3}
   leaves: {fileID: 8300000, guid: ebb0316113c295f4a9a2c5a373527a46, type: 3}
   breathingHard: {fileID: 8300000, guid: 88b8c569135e5f647b573893efd16ee1, type: 3}
+  heartBeat: {fileID: 8300000, guid: 0c81a82a722b1c34eb69b8b9d8fc5328, type: 3}
+  Footsteps1: {fileID: 8300000, guid: 0609acde86b59a2458aaf135531f8756, type: 3}
+  Footsteps2: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
+  Footsteps3: {fileID: 8300000, guid: e988fcf175fd1874db4f82c3b2d75db3, type: 3}
 --- !u!4 &257013043
 Transform:
   m_ObjectHideFlags: 0

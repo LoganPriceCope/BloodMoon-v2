@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
     public float speed; // Player Current Speed
     public float originalSpeed = 4f; // Default Walk Speed
     public float crouchSpeed = 1.5f; // Default Crouch Speed
-    public float runSpeed = 6f; // Default Run Speed
+    public float runSpeed = 10f; // Default Run Speed
     public float gravity = -9.81f;
     public float groundDistance = 0.1f;
     public float jumpHeight = 3f;
@@ -33,6 +33,8 @@ public class PlayerMovement : MonoBehaviour
     // Checks
     public bool isRunning = false;
     public bool isCrouching = false;
+    public bool isWalking = false;
+    bool isCrouchingSoundMuffled = false;
     bool isGrounded;
     bool canRun = true;
     bool runSoundPlayed = false;
@@ -41,8 +43,6 @@ public class PlayerMovement : MonoBehaviour
     // Other Variables
     private Vector3 lastPosition;
     Vector3 velocity;
-
-    public float currentLoudness = 10f;
     
 
     public void Awake()
@@ -63,10 +63,12 @@ public class PlayerMovement : MonoBehaviour
         // Walking Check
         if(Vector3.Distance(transform.position, lastPosition) > 0.01f)
         {
+            isWalking = true;
             playerAnimator.SetBool("Walking", true);
         }
         else
         {
+            isWalking = false;
             playerAnimator.SetBool("Walking", false);
         }
         lastPosition = transform.position;
@@ -77,6 +79,7 @@ public class PlayerMovement : MonoBehaviour
             playerAnimator.SetBool("Crouching", true);
             playerAnimator.SetBool("Walking", false);
             speed = crouchSpeed;
+            isRunning = false;
             isCrouching = true;
             controller.height = crouchHeight;
         }
@@ -86,18 +89,29 @@ public class PlayerMovement : MonoBehaviour
             isCrouching = false;
             controller.height = playerHeight;
         }
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
 
+            audioManager.ChangeSFXVolume(audioManager.SFXSource.volume / 4);
+        }
+        if (Input.GetKeyUp(KeyCode.LeftControl))
+        {
+
+            audioManager.ChangeSFXVolume(audioManager.SFXSource.volume * 4);
+        }
         // Sprinting
-        if (Input.GetKey(KeyCode.LeftShift) && !isCrouching && canRun)
+        if (Input.GetKey(KeyCode.LeftShift) && canRun)
         {
             speed = runSpeed;
             isRunning = true;
-            
+            isCrouching = false;
+            audioManager.SFXSource.pitch = 1.32f;
         }
         else if (!isCrouching)
         {
             speed = originalSpeed;
             isRunning = false;
+            audioManager.SFXSource.pitch = 1f;
         }
         
         // Stamina

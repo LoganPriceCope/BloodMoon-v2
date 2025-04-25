@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.VFX;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
+using FSR;
+using Unity.VisualScripting;
 
 namespace Player
 {
@@ -12,13 +14,11 @@ namespace Player
 
     public class PlayerScript : MonoBehaviour
     {
-
         public PlayerMovement playerMovement;
 
         public bool runMode = false;
 
 
-        // EEE
         public Transform[] points;
         public NavMeshAgent nav;
         public int destPoint;
@@ -30,25 +30,30 @@ namespace Player
         public GameObject deathFrame;
         public GameObject player;
         public GameObject enemy;
-        //EEE
 
         public LayerMask playerLayer;
 
         public float sightRange, killRange, awareRange;
         public bool playerInSightRange, playerInKillRange, playerInAwareRange;
 
-        // variables holding the different player states
         public AttackState attackState;
         public PartolState partolState;
         public AwareState awareState;
 
         public StateMachine sm;
+        public AudioManager am;
 
-
+        public float currentLoudness;
+        bool alert = false;
+        bool alertCooldown = false;
 
         // Start is called before the first frame update
         void Start()
         {
+            am = AudioManager.instance;
+
+            currentLoudness = 4f;
+
             nav = GetComponent<NavMeshAgent>();
 
             sm = gameObject.AddComponent<StateMachine>();
@@ -66,13 +71,82 @@ namespace Player
         // Update is called once per frame
         public void Update()
         {
-            awareRange = playerMovement.currentLoudness;
-            //if (playerMovement.carryingWinningPart)
-            //{
-             //   sightRange = 1000f;
+            awareRange = currentLoudness;
 
-            //}
-            playerInSightRange = Physics.CheckSphere(transform.position, sightRange, playerLayer);
+            if (alert == true)
+            {
+                if (alertCooldown == false)
+                {
+                    alertCooldown = true;
+                    sightRange = sightRange * 1.5f;
+                    StartCoroutine(AlertCooldown());
+                }
+            }
+            if (playerMovement.isCrouching && playerMovement.isWalking)
+            {
+                currentLoudness = 6f;
+                Debug.Log("Crouching Walking");
+            }
+            else if (playerMovement.isCrouching && !playerMovement.isWalking)
+            {
+                currentLoudness = 4f;
+                Debug.Log("Crouching");
+            }
+            else if (playerMovement.isWalking && !playerMovement.isRunning && !playerMovement.isCrouching)
+            {
+                currentLoudness = 14f;
+                Debug.Log("Walking");
+            }
+            else if (playerMovement.isWalking && playerMovement.isRunning)
+            {
+                currentLoudness = 18f;
+                Debug.Log("Running");
+            }
+            else if (!playerMovement.isRunning && !playerMovement.isWalking && !playerMovement.isCrouching)
+            {
+                currentLoudness = 10f;
+                Debug.Log("Idle");
+            }
+                /*else
+                {
+                    if (!am.SFXSource.isPlaying && !playerMovement.isCrouching && !playerMovement.isRunning)
+                    {
+                        currentLoudness = 12f;
+                        Debug.Log("Idle");
+                    }
+                    else if (playerMovement.isRunning)
+                    {
+                        if (am.SFXSource.isPlaying && am.SFXSource != null)
+                        {
+                            AudioClip currentAudioClip = am.SFXSource.clip;
+                            if (currentAudioClip == am.Footsteps1 || currentAudioClip == am.Footsteps2 || currentAudioClip == am.Footsteps3)
+                            {
+                                currentLoudness = 24f;
+                                Debug.Log("Running");
+                            }
+                        }
+                    else if (!playerMovement.isRunning)
+                    {
+                            if (am.SFXSource.isPlaying && am.SFXSource != null)
+                            {
+                                AudioClip currentAudioClip = am.SFXSource.clip;
+                                if (currentAudioClip == am.Footsteps1 || currentAudioClip == am.Footsteps2 || currentAudioClip == am.Footsteps3)
+                                {
+                                    currentLoudness = 18f;
+                                    Debug.Log("Walking");
+                                }
+                            }
+                        }
+                    }  
+                }*/
+
+
+                //if (playerMovement.carryingWinningPart)
+                //{
+                //   sightRange = 1000f;
+
+                //}
+                playerInSightRange = Physics.CheckSphere(transform.position, sightRange, playerLayer);
             playerInKillRange = Physics.CheckSphere(transform.position, killRange, playerLayer);
             playerInAwareRange = Physics.CheckSphere(transform.position, awareRange, playerLayer);
             sm.CurrentState.LogicUpdate();
@@ -94,7 +168,6 @@ namespace Player
         void FixedUpdate()
         {
             sm.CurrentState.PhysicsUpdate();
-            Debug.Log(sm.CurrentState);
             Aware();
             Kill();
         }
@@ -127,6 +200,7 @@ namespace Player
             if (playerInAwareRange == true && !playerInSightRange)
             {
                 sm.ChangeState(awareState);
+                alert = true;
             }
         }
 
@@ -142,7 +216,6 @@ namespace Player
         {
             if (playerInKillRange)
             {
-                Debug.Log("Enters");
                 deathFrame.SetActive(true);
                 Invoke("Restart", 5f);
             }
@@ -153,7 +226,7 @@ namespace Player
             SceneManager.LoadScene("SampleScene");
         }
 
-        private void OnDrawGizmosSelected()
+        private void OnDrawGizmos()
         {
             Gizmos.color = Color.yellow;
             Gizmos.DrawSphere(transform.position, sightRange);
@@ -161,6 +234,15 @@ namespace Player
             Gizmos.DrawSphere(transform.position, killRange);
             Gizmos.color = Color.blue;
             Gizmos.DrawSphere(transform.position, awareRange);
+        }
+
+        public IEnumerator AlertCooldown()
+        {
+            am.SFXSource.PlayOneShot(am.heartBeat);
+            yield return new WaitForSeconds(4);
+            alert = false;
+            alertCooldown = false;
+            sightRange = sightRange / 1.5f;
         }
     }
 }

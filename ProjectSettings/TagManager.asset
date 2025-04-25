@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Audio
   - Enemy
+  - SFXSource
   layers:
   - Default
   - TransparentFX
