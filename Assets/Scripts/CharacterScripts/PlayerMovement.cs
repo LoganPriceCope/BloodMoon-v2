@@ -120,19 +120,19 @@ public class PlayerMovement : MonoBehaviour
         {
             if (staminaBar < 100)
             {
-                staminaBar = staminaBar + 0.03f;
+                staminaBar = staminaBar + 0.2f;
             }
         }
         else
         {
             if (staminaBar > 0)
             {
-                staminaBar = staminaBar - 0.03f;
+                staminaBar = staminaBar - 0.2f;
             }
         }
         if (volume.profile.TryGet(out mainVignette))
         {
-            LeanTween.value(mainVignette.intensity.value, (staminaBar / 1000f) + 0.45f, 0.1f)
+            LeanTween.value(mainVignette.intensity.value, (staminaBar / 1000f) + 0.45f, 0.8f)
                 .setOnUpdate((float val) =>
                 {
                     mainVignette.intensity.value = val;

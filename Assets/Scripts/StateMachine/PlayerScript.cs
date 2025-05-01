@@ -78,33 +78,33 @@ namespace Player
                 if (alertCooldown == false)
                 {
                     alertCooldown = true;
-                    sightRange = sightRange * 1.5f;
+                    sightRange = sightRange * 2.5f;
                     StartCoroutine(AlertCooldown());
                 }
             }
             if (playerMovement.isCrouching && playerMovement.isWalking)
             {
-                currentLoudness = 6f;
+                currentLoudness = 8f;
                 Debug.Log("Crouching Walking");
             }
             else if (playerMovement.isCrouching && !playerMovement.isWalking)
             {
-                currentLoudness = 4f;
+                currentLoudness = 6f;
                 Debug.Log("Crouching");
             }
             else if (playerMovement.isWalking && !playerMovement.isRunning && !playerMovement.isCrouching)
             {
-                currentLoudness = 14f;
+                currentLoudness = 20f;
                 Debug.Log("Walking");
             }
             else if (playerMovement.isWalking && playerMovement.isRunning)
             {
-                currentLoudness = 18f;
+                currentLoudness = 35f;
                 Debug.Log("Running");
             }
             else if (!playerMovement.isRunning && !playerMovement.isWalking && !playerMovement.isCrouching)
             {
-                currentLoudness = 10f;
+                currentLoudness = 16f;
                 Debug.Log("Idle");
             }
                 /*else
@@ -202,6 +202,13 @@ namespace Player
                 sm.ChangeState(awareState);
                 alert = true;
             }
+            else
+            {
+                if (playerInSightRange)
+                {
+                    sm.ChangeState(attackState);
+                }
+            }
         }
 
         public void Attack()
@@ -242,7 +249,7 @@ namespace Player
             yield return new WaitForSeconds(4);
             alert = false;
             alertCooldown = false;
-            sightRange = sightRange / 1.5f;
+            sightRange = sightRange / 2.5f;
         }
     }
 }
