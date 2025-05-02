@@ -7,6 +7,7 @@ using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 using FSR;
 using Unity.VisualScripting;
+using UnityEngine.Rendering.VirtualTexturing;
 
 namespace Player
 {
@@ -15,6 +16,7 @@ namespace Player
     public class PlayerScript : MonoBehaviour
     {
         public PlayerMovement playerMovement;
+        public DiarySystem diarySystem;
 
         public bool runMode = false;
 
@@ -31,6 +33,8 @@ namespace Player
         public GameObject player;
         public GameObject enemy;
 
+        public Animator enemyAnimator;
+
         public LayerMask playerLayer;
 
         public float sightRange, killRange, awareRange;
@@ -43,9 +47,15 @@ namespace Player
         public StateMachine sm;
         public AudioManager am;
 
+        public AudioSource attackSource;
+
         public float currentLoudness;
         bool alert = false;
         bool alertCooldown = false;
+        bool canWalk = true;
+        bool canAttackSound = true;
+        bool canAttack = true;
+        public bool isInAttackZone = false;
 
         // Start is called before the first frame update
         void Start()
@@ -71,7 +81,15 @@ namespace Player
         // Update is called once per frame
         public void Update()
         {
-            awareRange = currentLoudness;
+            if (canWalk)
+            {
+                nav.speed = 4.1f * (1f + (diarySystem.pages / 10f));
+            }
+            else
+            {
+                nav.speed = 2f;
+            }
+                awareRange = currentLoudness;
 
             if (alert == true)
             {
@@ -107,46 +125,7 @@ namespace Player
                 currentLoudness = 16f;
                 Debug.Log("Idle");
             }
-                /*else
-                {
-                    if (!am.SFXSource.isPlaying && !playerMovement.isCrouching && !playerMovement.isRunning)
-                    {
-                        currentLoudness = 12f;
-                        Debug.Log("Idle");
-                    }
-                    else if (playerMovement.isRunning)
-                    {
-                        if (am.SFXSource.isPlaying && am.SFXSource != null)
-                        {
-                            AudioClip currentAudioClip = am.SFXSource.clip;
-                            if (currentAudioClip == am.Footsteps1 || currentAudioClip == am.Footsteps2 || currentAudioClip == am.Footsteps3)
-                            {
-                                currentLoudness = 24f;
-                                Debug.Log("Running");
-                            }
-                        }
-                    else if (!playerMovement.isRunning)
-                    {
-                            if (am.SFXSource.isPlaying && am.SFXSource != null)
-                            {
-                                AudioClip currentAudioClip = am.SFXSource.clip;
-                                if (currentAudioClip == am.Footsteps1 || currentAudioClip == am.Footsteps2 || currentAudioClip == am.Footsteps3)
-                                {
-                                    currentLoudness = 18f;
-                                    Debug.Log("Walking");
-                                }
-                            }
-                        }
-                    }  
-                }*/
-
-
-                //if (playerMovement.carryingWinningPart)
-                //{
-                //   sightRange = 1000f;
-
-                //}
-                playerInSightRange = Physics.CheckSphere(transform.position, sightRange, playerLayer);
+            playerInSightRange = Physics.CheckSphere(transform.position, sightRange, playerLayer);
             playerInKillRange = Physics.CheckSphere(transform.position, killRange, playerLayer);
             playerInAwareRange = Physics.CheckSphere(transform.position, awareRange, playerLayer);
             sm.CurrentState.LogicUpdate();
@@ -170,19 +149,36 @@ namespace Player
             sm.CurrentState.PhysicsUpdate();
             Aware();
             Kill();
+            Attack();
         }
 
+        public void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.tag == "Player")
+            {
+                isInAttackZone = true;
+            }
+        }
 
+        public void OnTriggerExit(Collider other)
+        {
+            if (other.gameObject.tag == "Player")
+            {
+                isInAttackZone = false;
+            }
+        }
 
         public void CheckForPartol()
         {
             if (!playerInSightRange && !playerInAwareRange)
             {
                 sm.ChangeState(partolState);
+                print("Partol State");
             }
             else if (!playerInSightRange)
             {
                 sm.ChangeState(awareState);
+                print("Aware State");
             }
         }
 
@@ -197,40 +193,62 @@ namespace Player
 
         public void Aware()
         {
-            if (playerInAwareRange == true && !playerInSightRange)
+            if (playerInAwareRange && !playerInSightRange)
             {
                 sm.ChangeState(awareState);
+                print("Aware State");
                 alert = true;
-            }
-            else
-            {
-                if (playerInSightRange)
-                {
-                    sm.ChangeState(attackState);
-                }
             }
         }
 
         public void Attack()
         {
-            if (playerInSightRange == true)
+            if (playerInSightRange)
             {
                 sm.ChangeState(attackState);
+                print("Attack State");
             }
         }
 
         public void Kill()
         {
-            if (playerInKillRange)
+            if (playerInKillRange && canAttack)
             {
-                deathFrame.SetActive(true);
-                Invoke("Restart", 5f);
+                if (canAttackSound)
+                {
+                    attackSource.Play();
+                    canAttackSound = false;
+                }
+                canAttack = false;
+                canWalk = false;
+                enemyAnimator.SetBool("Attacking", true);
+                Invoke("ResetAnimation", 1.5f);
+                Invoke("KillPlayer", 0.4f);
+            }
+        }
+
+        public void KillPlayer()
+        {
+            if (isInAttackZone)
+            {
+                playerMovement.health--;
+                ResetAnimation();
+            }
+        }
+        public void ResetAnimation()
+        {
+            if (!playerInKillRange)
+            {
+                canWalk = true;
+                enemyAnimator.SetBool("Attacking", false);
+                canAttackSound = true;
+                canAttack = true;
             }
         }
 
         public void Restart()
         {
-            SceneManager.LoadScene("SampleScene");
+            SceneManager.LoadScene("MainGame");
         }
 
         private void OnDrawGizmos()

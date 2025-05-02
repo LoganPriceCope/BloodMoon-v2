@@ -30,6 +30,9 @@ public class PlayerMovement : MonoBehaviour
 
     public float staminaBar = 0f;
 
+    public float health = 2f;
+    public GameObject bloodEffect;
+
     // Checks
     public bool isRunning = false;
     public bool isCrouching = false;
@@ -39,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
     bool canRun = true;
     bool runSoundPlayed = false;
     bool inFade = false;
+
 
     // Other Variables
     private Vector3 lastPosition;
@@ -114,20 +118,29 @@ public class PlayerMovement : MonoBehaviour
             audioManager.SFXSource.pitch = 1f;
         }
         
+        if (health == 2)
+        {
+            bloodEffect.SetActive(false);
+        }
+        else
+        {
+            bloodEffect.SetActive(true);
+        }
+
         // Stamina
         // (explanation for me: If the stamina bar is above 0, it will subtract 0.2f. However, if the player is running and has less than 100 stamina, stamima will increase by 0.2f.)
         if (isRunning)
         {
             if (staminaBar < 100)
             {
-                staminaBar = staminaBar + 0.2f;
+                staminaBar = staminaBar + 0.05f;
             }
         }
         else
         {
             if (staminaBar > 0)
             {
-                staminaBar = staminaBar - 0.2f;
+                staminaBar = staminaBar - 0.05f;
             }
         }
         if (volume.profile.TryGet(out mainVignette))

@@ -16,6 +16,9 @@ public class AudioManager : MonoBehaviour
     public AudioClip leaves;
     public AudioClip breathingHard;
     public AudioClip heartBeat;
+    public AudioClip pageFlip;
+    public AudioClip enemyAttack;
+    public AudioClip bloodEffect;
 
     public AudioClip Footsteps1;
     public AudioClip Footsteps2;

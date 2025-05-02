@@ -8,7 +8,7 @@ public class DiarySystem : MonoBehaviour
     public AudioSource beastSoundSource;
     public AudioClip beastSoundClip;
     AudioManager audioManager;
-    public int pages = 0;
+    public float pages = 0;
     int totalPages = 10;
     public GameObject counterTextObject;
     public Text secondaryCounterObject;
@@ -40,8 +40,8 @@ public class DiarySystem : MonoBehaviour
     void Update()
     {
         print(pages);
-        counterText.text = pages + "/" + totalPages + " Pages";
-        secondaryCounterObject.text = pages + "/" + totalPages + " Pages Acquired";
+        counterText.text = pages + "/" + totalPages + " Ink";
+        secondaryCounterObject.text = pages + "/" + totalPages + "";
     }
 
     public void IncreasePages()

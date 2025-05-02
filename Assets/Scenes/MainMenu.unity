@@ -905,6 +905,9 @@ MonoBehaviour:
   leaves: {fileID: 8300000, guid: ebb0316113c295f4a9a2c5a373527a46, type: 3}
   breathingHard: {fileID: 8300000, guid: 88b8c569135e5f647b573893efd16ee1, type: 3}
   heartBeat: {fileID: 8300000, guid: 0c81a82a722b1c34eb69b8b9d8fc5328, type: 3}
+  pageFlip: {fileID: 8300000, guid: e14c1b054b677d84cb3cf2622d388ef8, type: 3}
+  enemyAttack: {fileID: 8300000, guid: 27623b98c55c2a546b036c04565d8514, type: 3}
+  bloodEffect: {fileID: 8300000, guid: 059732619bfb1ac4e9673c01f85fde47, type: 3}
   Footsteps1: {fileID: 8300000, guid: 0609acde86b59a2458aaf135531f8756, type: 3}
   Footsteps2: {fileID: 8300000, guid: fdfa07727ba18e146b0d737f16110ba5, type: 3}
   Footsteps3: {fileID: 8300000, guid: e988fcf175fd1874db4f82c3b2d75db3, type: 3}
