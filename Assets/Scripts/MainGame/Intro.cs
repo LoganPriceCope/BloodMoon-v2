@@ -13,6 +13,7 @@ public class Intro : MonoBehaviour
     public PlayerMovement playerMovementScript;
     public MouseLook mouseLookScript;
     public GameObject player;
+    public GameObject canvas;
 
 
     public Image fade;
@@ -24,6 +25,7 @@ public class Intro : MonoBehaviour
     {
         audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
         player.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+        canvas.SetActive(true);
     }
 
     void Start()
@@ -62,8 +64,8 @@ public class Intro : MonoBehaviour
     private IEnumerator Fade()
     {
         audioManager.PlaySFX(audioManager.leaves);
-        yield return new WaitForSeconds(0.5f);
-        LeanTween.value(fade.color.a, 0f, 5f)
+        yield return new WaitForSeconds(1.5f);
+        LeanTween.value(fade.color.a, 0f, 10f)
             .setOnUpdate((float val) =>
             {
                 Color c = fade.color;
@@ -75,8 +77,8 @@ public class Intro : MonoBehaviour
 
     private IEnumerator RotatePlayer()
     {
-        yield return new WaitForSeconds(5f);
-        LeanTween.rotateX(player, 0f, 3f);
+        yield return new WaitForSeconds(4f);
+        LeanTween.rotateX(player, 0f, 2f);
         StartCoroutine(EndCutscene());
 
     }

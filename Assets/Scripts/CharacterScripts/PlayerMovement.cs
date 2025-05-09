@@ -16,6 +16,10 @@ public class PlayerMovement : MonoBehaviour
     private Vignette mainVignette;
     public LayerMask groundMask;
 
+    public GameObject playerCamera;
+    public GameObject cutsceneCamera;
+    public GameObject blackOut;
+
     // Player Settings
     public float speed; // Player Current Speed
     public float originalSpeed = 4f; // Default Walk Speed
@@ -122,9 +126,16 @@ public class PlayerMovement : MonoBehaviour
         {
             bloodEffect.SetActive(false);
         }
-        else
+        else if (health == 1)
         {
             bloodEffect.SetActive(true);
+        }
+        else
+        {
+            playerCamera.SetActive(false);
+            cutsceneCamera.SetActive(true);
+            bloodEffect.SetActive(false);
+            Invoke("BlackOut", 1.8f);
         }
 
         // Stamina
@@ -193,5 +204,10 @@ public class PlayerMovement : MonoBehaviour
             runSoundPlayed = true;
             audioManager.PlaySFX(audioManager.breathingHard);
         }
+    }
+
+    void BlackOut()
+    {
+        blackOut.SetActive(true);
     }
 }

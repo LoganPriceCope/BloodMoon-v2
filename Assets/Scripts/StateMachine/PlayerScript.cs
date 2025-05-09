@@ -87,7 +87,7 @@ namespace Player
             }
             else
             {
-                nav.speed = 2f;
+                nav.speed = 1f;
             }
                 awareRange = currentLoudness;
 
@@ -117,7 +117,7 @@ namespace Player
             }
             else if (playerMovement.isWalking && playerMovement.isRunning)
             {
-                currentLoudness = 35f;
+                currentLoudness = 28f;
                 Debug.Log("Running");
             }
             else if (!playerMovement.isRunning && !playerMovement.isWalking && !playerMovement.isCrouching)
@@ -150,22 +150,7 @@ namespace Player
             Aware();
             Kill();
             Attack();
-        }
-
-        public void OnTriggerEnter(Collider other)
-        {
-            if (other.gameObject.tag == "Player")
-            {
-                isInAttackZone = true;
-            }
-        }
-
-        public void OnTriggerExit(Collider other)
-        {
-            if (other.gameObject.tag == "Player")
-            {
-                isInAttackZone = false;
-            }
+            print(isInAttackZone);
         }
 
         public void CheckForPartol()
@@ -212,40 +197,45 @@ namespace Player
 
         public void Kill()
         {
+            print("Calling kill");
             if (playerInKillRange && canAttack)
             {
+                print("Starting attack");
+                canAttack = false;
+                canWalk = false;
                 if (canAttackSound)
                 {
                     attackSource.Play();
-                    canAttackSound = false;
+                    //canAttackSound = false;
                 }
-                canAttack = false;
-                canWalk = false;
                 enemyAnimator.SetBool("Attacking", true);
-                Invoke("ResetAnimation", 1.5f);
+                //Invoke("ResetAnimation", 1.5f);
                 Invoke("KillPlayer", 0.4f);
             }
         }
 
         public void KillPlayer()
         {
-            if (isInAttackZone)
+            print("Starting kill player");
+            if (playerInKillRange)
             {
-                playerMovement.health--;
-                ResetAnimation();
+                print("The player has been killed");
+                if(playerMovement.health >= 0)
+                {
+                    playerMovement.health--;
+                    am.SFXSource.PlayOneShot(am.bloodEffect);
+                }
             }
+            Invoke("ResetAnimation", 1.75f);
         }
         public void ResetAnimation()
         {
-            if (!playerInKillRange)
-            {
+                print("Starting reset animation");
                 canWalk = true;
                 enemyAnimator.SetBool("Attacking", false);
-                canAttackSound = true;
+                //canAttackSound = true;
                 canAttack = true;
-            }
         }
-
         public void Restart()
         {
             SceneManager.LoadScene("MainGame");
