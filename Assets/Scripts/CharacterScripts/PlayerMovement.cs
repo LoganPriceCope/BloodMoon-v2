@@ -209,5 +209,7 @@ public class PlayerMovement : MonoBehaviour
     void BlackOut()
     {
         blackOut.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

@@ -89,5 +89,6 @@ public class Intro : MonoBehaviour
         playerMovementScript.speed = 3f;
         playerMovementScript.gravity = -19.62f;
         mouseLookScript.mouseSensitivity = 150f;
+        canvas.SetActive(false);
     }
 }
