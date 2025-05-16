@@ -3,16 +3,14 @@ using UnityEngine;
 public class PickupScript : MonoBehaviour
 {
     public DiarySystem system;
-    void Start()
-    {
-        
-    }
+    public ArrowScript arrowScript;
+
 
     public void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player")
         {
-            print("E");
+            arrowScript.RegisterPickup(transform);
             system.IncreasePages();
             Destroy(gameObject);
         }

@@ -15,6 +15,8 @@ public class PlayerMovement : MonoBehaviour
     AudioManager audioManager;
     private Vignette mainVignette;
     public LayerMask groundMask;
+    public Intro introScript;
+
 
     public GameObject playerCamera;
     public GameObject cutsceneCamera;
@@ -82,7 +84,7 @@ public class PlayerMovement : MonoBehaviour
         lastPosition = transform.position;
 
         // Crouching
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.LeftControl) && !introScript.IsInIntro)
         {
             playerAnimator.SetBool("Crouching", true);
             playerAnimator.SetBool("Walking", false);
@@ -108,14 +110,14 @@ public class PlayerMovement : MonoBehaviour
             audioManager.ChangeSFXVolume(audioManager.SFXSource.volume * 4);
         }
         // Sprinting
-        if (Input.GetKey(KeyCode.LeftShift) && canRun)
+        if (Input.GetKey(KeyCode.LeftShift) && canRun && !introScript.IsInIntro)
         {
             speed = runSpeed;
             isRunning = true;
             isCrouching = false;
             audioManager.SFXSource.pitch = 1.32f;
         }
-        else if (!isCrouching)
+        else if (!isCrouching && !introScript.IsInIntro)
         {
             speed = originalSpeed;
             isRunning = false;

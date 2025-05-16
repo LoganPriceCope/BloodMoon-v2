@@ -14,7 +14,7 @@ public class Intro : MonoBehaviour
     public MouseLook mouseLookScript;
     public GameObject player;
     public GameObject canvas;
-
+    public bool IsInIntro = true;
 
     public Image fade;
     public GameObject text;
@@ -90,5 +90,6 @@ public class Intro : MonoBehaviour
         playerMovementScript.gravity = -19.62f;
         mouseLookScript.mouseSensitivity = 150f;
         canvas.SetActive(false);
+        IsInIntro = false;
     }
 }

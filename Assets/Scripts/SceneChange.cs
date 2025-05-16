@@ -32,19 +32,24 @@ public class SceneChange : MonoBehaviour
         }
         
     }
+
+    public void Quit()
+    {
+        Application.Quit();
+    }
     public void OpenMainMenu()
     {
         print("EEE");
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(0);
        
     }
 
     public void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player" && diarySystem.pages == 10)
         {
             winCutscene.SetActive(true);
-            Invoke("WinScreen", 2.4f);
+            Invoke("WinScreen", 2.8f);
         }
     }
 

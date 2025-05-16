@@ -18,6 +18,10 @@ public class MainMenuUI : MonoBehaviour
     public GameObject quitButtonEffect;
     public GameObject quitButton;
 
+    public GameObject tutorialButton;
+
+
+    public GameObject tutorialMenu;
     public GameObject settingsMenu;
 
     private Vector3 originalButtonScale;
@@ -80,7 +84,12 @@ public class MainMenuUI : MonoBehaviour
     private IEnumerator ChangeScene()
     {
         yield return new WaitForSeconds(2.5f);
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(1);
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
     }
 
     public void ScalePlayButtonStart()
@@ -136,6 +145,19 @@ public class MainMenuUI : MonoBehaviour
         LeanTween.scale(quitButton, originalButtonScale, 0.12f);
     }
 
+    public void ScaleTutorialButtonStart()
+    {
+        audioManager.PlaySFX(audioManager.hover);
+
+        LeanTween.scale(tutorialButton, ButtonScaleAfter, 0.12f);
+    }
+
+    public void ScaleTutorialButtonEnd()
+    {
+
+        LeanTween.scale(tutorialButton, originalButtonScale, 0.12f);
+    }
+
     public void SettingsOpen()
     {
         audioManager.PlaySFX(audioManager.click);
@@ -146,5 +168,17 @@ public class MainMenuUI : MonoBehaviour
     {
         audioManager.PlaySFX(audioManager.click);
         LeanTween.moveLocalY(settingsMenu, 902f, 0.3f);
+    }
+
+    public void TutorialOpen()
+    {
+        audioManager.PlaySFX(audioManager.click);
+        LeanTween.moveLocalY(tutorialMenu, -28f, 0.3f);
+    }
+
+    public void TutorialClose()
+    {
+        audioManager.PlaySFX(audioManager.click);
+        LeanTween.moveLocalY(tutorialMenu, 902f, 0.3f);
     }
 }

@@ -27,7 +27,7 @@ TagManager:
   - 
   - MainGround
   - Player
-  - 
+  - Arrow
   - 
   - 
   - 
@@ -47,3 +47,4 @@ TagManager:
     locked: 0
   m_RenderingLayers:
   - Default
+  - Arrow
