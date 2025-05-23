@@ -12,6 +12,7 @@ public class SceneChange : MonoBehaviour
     float elapsedTime;
     public Text timerObject;
     public Text inkObject;
+    public GameObject player;
 
     public DiarySystem diarySystem;
 
@@ -49,6 +50,7 @@ public class SceneChange : MonoBehaviour
         if (other.gameObject.tag == "Player" && diarySystem.pages == 10)
         {
             winCutscene.SetActive(true);
+            player.SetActive(false);
             Invoke("WinScreen", 2.8f);
         }
     }

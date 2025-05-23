@@ -82,7 +82,7 @@ namespace Player
         {
             if (canWalk)
             {
-                nav.speed = 4.1f * (1f + (diarySystem.pages / 10f));
+                nav.speed = 4.1f * (1f + (diarySystem.pages / 10f)); // was 4.1
             }
             else
             {
